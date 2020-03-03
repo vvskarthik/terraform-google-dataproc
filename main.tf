@@ -21,13 +21,13 @@ resource "google_storage_bucket" "gcs_bucket" {
 resource "null_resource" "cluster" {
   # Changes to script will reprovision the cluster
   triggers = {
-    scripts = "${sha1(file("${path.module}/config/config.sh"))}"
+    scripts = "${sha1(file("${path.module}/config.sh"))}"
   }
 
   depends_on = ["google_storage_bucket.gcs_bucket"]
 
   provisioner "local-exec" {
-    command = "gsutil cp ${path.module}/files/* ${google_storage_bucket.gcs_bucket.url}/scripts/"
+    command = "gsutil cp ${path.module}/config.sh ${google_storage_bucket.gcs_bucket.url}/scripts/"
 
   }
 }
@@ -86,7 +86,7 @@ resource "google_dataproc_cluster" "main" {
     }
 
     initialization_action {
-      script      = "gs://${google_storage_bucket.gcs_bucket.name}/scripts/init.sh"
+      script      = "gs://${google_storage_bucket.gcs_bucket.name}/scripts/config.sh"
       timeout_sec = 500
     }
 
